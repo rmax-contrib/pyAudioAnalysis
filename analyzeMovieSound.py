@@ -10,9 +10,9 @@ import sys
 
 from six.moves import cPickle
 
-import audioBasicIO
-import audioSegmentation as aS
-import audioTrainTest as aT
+from . import audioBasicIO
+from . import audioSegmentation as aS
+from . import audioTrainTest as aT
 
 minDuration = 7
 
@@ -53,7 +53,7 @@ def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
         Result = int(Result)
         Results.append(Result)
         if outputMode:
-            print("{0:s}\t{1:s}".format(wavFile, classNames[Result]))
+            print(("{0:s}\t{1:s}".format(wavFile, classNames[Result])))
     Results = numpy.array(Results)
 
     # print distribution of classes:
@@ -61,7 +61,7 @@ def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
         Results, bins=numpy.arange(len(classNames) + 1))
     if outputMode:
         for i, h in enumerate(Histogram):
-            print("{0:20s}\t\t{1:d}".format(classNames[i], h))
+            print(("{0:20s}\t\t{1:d}".format(classNames[i], h)))
     PsAll = PsAll / numpy.sum(PsAll)
 
     if outputMode:
@@ -69,9 +69,9 @@ def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
         ax = fig.add_subplot(111)
         plt.title("Classes percentage " + inputFolder.replace('Segments', ''))
         ax.axis((0, len(classNames) + 1, 0, 1))
-        ax.set_xticks(numpy.array(range(len(classNames) + 1)))
+        ax.set_xticks(numpy.array(list(range(len(classNames) + 1))))
         ax.set_xticklabels([" "] + classNames)
-        ax.bar(numpy.array(range(len(classNames))) + 0.5, PsAll)
+        ax.bar(numpy.array(list(range(len(classNames)))) + 0.5, PsAll)
         plt.show()
     return classNames, PsAll
 
@@ -112,13 +112,13 @@ def analyzeDir(dirPath):
         [c, P] = classifyFolderWrapper(
             f[0:-4] + "_musicSegments", "svm", "data/svmMusicGenre8", False)
         if i == 0:
-            print("".ljust(100) + "\t",)
+            print(("".ljust(100) + "\t",))
             for C in c:
-                print(C.ljust(12) + "\t",)
+                print((C.ljust(12) + "\t",))
             print()
-        print(f.ljust(100) + "\t",)
+        print((f.ljust(100) + "\t",))
         for p in P:
-            print("{0:.2f}".format(p).ljust(12) + "\t",)
+            print(("{0:.2f}".format(p).ljust(12) + "\t",))
         print()
 
 
@@ -203,13 +203,13 @@ def main(argv):
             histTemp /= histTemp.sum()
 
             if i == 0:
-                print("".ljust(100) + "\t",)
+                print(("".ljust(100) + "\t",))
                 for C in classesAll:
-                    print(C.ljust(12) + "\t",)
+                    print((C.ljust(12) + "\t",))
                 print()
-            print(w.ljust(100) + "\t",)
+            print((w.ljust(100) + "\t",))
             for h in histTemp:
-                print("{0:.2f}".format(h).ljust(12) + "\t",)
+                print(("{0:.2f}".format(h).ljust(12) + "\t",))
             print()
 
     return 0

@@ -19,8 +19,8 @@ from matplotlib.mlab import find
 from scipy import linalg as la
 from scipy.spatial import distance
 
-import audioBasicIO
-import audioFeatureExtraction as aF
+from . import audioBasicIO
+from . import audioFeatureExtraction as aF
 
 
 def signal_handler(signal, frame):
@@ -128,7 +128,7 @@ def randSplitFeatures(features, partTrain):
     featuresTest = []
     for i, f in enumerate(features):
         [numOfSamples, numOfDims] = f.shape
-        randperm = numpy.random.permutation(range(numOfSamples))
+        randperm = numpy.random.permutation(list(range(numOfSamples)))
         nTrainSamples = int(round(partTrain * numOfSamples))
         featuresTrain.append(f[randperm[0:nTrainSamples]])
         featuresTest.append(f[randperm[nTrainSamples::]])
@@ -316,8 +316,8 @@ def featureAndTrain(listOfDirs, mtWin, mtStep, stWin, stStep, classifierType, mo
 
     for i, f in enumerate(features):
         if len(f) == 0:
-            print("trainSVM_feature ERROR: " +
-                  listOfDirs[i] + " folder is empty or non-existing!")
+            print(("trainSVM_feature ERROR: " +
+                  listOfDirs[i] + " folder is empty or non-existing!"))
             return
 
     # --------------------------------- #
@@ -350,7 +350,7 @@ def featureAndTrain(listOfDirs, mtWin, mtStep, stWin, stStep, classifierType, mo
     bestParam = evaluateClassifier(
         features, classNames, 100, classifierType, classifierParams, 0, perTrain)
 
-    print("Selected params: {0:.5f}".format(bestParam))
+    print(("Selected params: {0:.5f}".format(bestParam)))
 
     C = len(classNames)
     [featuresNorm, MEAN, STD] = normalizeFeatures(features)
@@ -390,7 +390,7 @@ def featureAndTrain(listOfDirs, mtWin, mtStep, stWin, stStep, classifierType, mo
         cPickle.dump(stStep, fo, protocol=cPickle.HIGHEST_PROTOCOL)
         cPickle.dump(computeBEAT, fo, protocol=cPickle.HIGHEST_PROTOCOL)
         fo.close()
-        print(modelName + " saved")
+        print((modelName + " saved"))
 
     elif classifierType == "svm" \
             or classifierType == "svm_rbf" \
@@ -409,7 +409,7 @@ def featureAndTrain(listOfDirs, mtWin, mtStep, stWin, stStep, classifierType, mo
         cPickle.dump(stStep, fo, protocol=cPickle.HIGHEST_PROTOCOL)
         cPickle.dump(computeBEAT, fo, protocol=cPickle.HIGHEST_PROTOCOL)
         fo.close()
-        print("svm " + modelName + " saved")
+        print(("svm " + modelName + " saved"))
 
 
 def featureAndTrainRegression(dirName, mtWin, mtStep, stWin, stStep, modelType, modelName, computeBEAT=False):
@@ -485,13 +485,13 @@ def featureAndTrainRegression(dirName, mtWin, mtStep, stWin, stStep, modelType, 
 
     for iRegression, r in enumerate(regressionNames):
         # get optimal classifeir parameter:
-        print("Regression task " + r)
+        print(("Regression task " + r))
         bestParam, error, berror = evaluateRegression(featuresFinal[iRegression], regressionLabels[
                                                       iRegression], 100, modelType, modelParams)
         errors.append(error)
         errorsBase.append(berror)
         bestParams.append(bestParam)
-        print("Selected params: {0:.5f}".format(bestParam))
+        print(("Selected params: {0:.5f}".format(bestParam)))
 
         [featuresNorm, MEAN, STD] = normalizeFeatures(
             [featuresFinal[iRegression]])        # normalize features
@@ -544,7 +544,7 @@ def loadKNNModel(kNNModelName, isRegression=False):
         computeBEAT = cPickle.load(fo)
         print(MEAN)
         print(STD)
-        print(mtWin, mtStep, stWin, stStep, computeBEAT)
+        print((mtWin, mtStep, stWin, stStep, computeBEAT))
     except:
         fo.close()
     fo.close()
@@ -766,8 +766,8 @@ def evaluateClassifier(features, ClassNames, nExp, ClassifierName, Params, param
         CM = numpy.zeros((nClasses, nClasses))
         # for each cross-validation iteration:
         for e in range(nExp):
-            print(
-                "Param = {0:.5f} - Classifier Evaluation Experiment {1:d} of {2:d}".format(C, e + 1, nExp))
+            print((
+                "Param = {0:.5f} - Classifier Evaluation Experiment {1:d} of {2:d}".format(C, e + 1, nExp)))
             # split features:
             featuresTrain, featuresTest = randSplitFeatures(
                 featuresNorm, perTrain)
@@ -813,29 +813,29 @@ def evaluateClassifier(features, ClassNames, nExp, ClassifierName, Params, param
         F1All.append(numpy.mean(F1))
         # print("{0:6.4f}{1:6.4f}{2:6.1f}{3:6.1f}".format(nu, g, 100.0*acAll[-1], 100.0*F1All[-1]))
 
-    print("\t\t"),
+    print(("\t\t"), end=' ')
     for i, c in enumerate(ClassNames):
         if i == len(ClassNames) - 1:
-            print("{0:s}\t\t".format(c),)
+            print(("{0:s}\t\t".format(c),))
         else:
-            print("{0:s}\t\t\t".format(c),)
+            print(("{0:s}\t\t\t".format(c),))
     print("OVERALL")
-    print("\tC"),
+    print(("\tC"), end=' ')
     for c in ClassNames:
-        print("\tPRE\tREC\tF1",)
-    print("\t{0:s}\t{1:s}".format("ACC", "F1"))
+        print(("\tPRE\tREC\tF1",))
+    print(("\t{0:s}\t{1:s}".format("ACC", "F1")))
     bestAcInd = numpy.argmax(acAll)
     bestF1Ind = numpy.argmax(F1All)
     for i in range(len(PrecisionClassesAll)):
-        print("\t{0:.3f}".format(Params[i]),)
+        print(("\t{0:.3f}".format(Params[i]),))
         for c in range(len(PrecisionClassesAll[i])):
-            print("\t{0:.1f}\t{1:.1f}\t{2:.1f}".format(100.0 * PrecisionClassesAll[
-                  i][c], 100.0 * RecallClassesAll[i][c], 100.0 * F1ClassesAll[i][c]),)
-        print("\t{0:.1f}\t{1:.1f}".format(100.0 * acAll[i], 100.0 * F1All[i]),)
+            print(("\t{0:.1f}\t{1:.1f}\t{2:.1f}".format(100.0 * PrecisionClassesAll[
+                  i][c], 100.0 * RecallClassesAll[i][c], 100.0 * F1ClassesAll[i][c]),))
+        print(("\t{0:.1f}\t{1:.1f}".format(100.0 * acAll[i], 100.0 * F1All[i]),))
         if i == bestF1Ind:
-            print("\t best F1",)
+            print(("\t best F1",))
         if i == bestAcInd:
-            print("\t best Acc",)
+            print(("\t best Acc",))
         print()
 
     # keep parameters that maximize overall classification accuracy:
@@ -876,7 +876,7 @@ def evaluateRegression(features, labels, nExp, MethodName, Params):
         # for each cross-validation iteration:
         for e in range(nExp):
             # split features:
-            randperm = numpy.random.permutation(range(nSamples))
+            randperm = numpy.random.permutation(list(range(nSamples)))
             nTrain = int(round(partTrain * nSamples))
             featuresTrain = [featuresNorm[randperm[i]] for i in range(nTrain)]
             featuresTest = [featuresNorm[randperm[i + nTrain]]
@@ -916,13 +916,13 @@ def evaluateRegression(features, labels, nExp, MethodName, Params):
 
     bestInd = numpy.argmin(ErrorsAll)
 
-    print("{0:s}\t\t{1:s}\t\t{2:s}\t\t{3:s}".format(
-        "Param", "MSE", "T-MSE", "R-MSE"))
+    print(("{0:s}\t\t{1:s}\t\t{2:s}\t\t{3:s}".format(
+        "Param", "MSE", "T-MSE", "R-MSE")))
     for i in range(len(ErrorsAll)):
-        print("{0:.4f}\t\t{1:.2f}\t\t{2:.2f}\t\t{3:.2f}".format(
-            Params[i], ErrorsAll[i], ErrorsTrainAll[i], ErrorsBaselineAll[i]),)
+        print(("{0:.4f}\t\t{1:.2f}\t\t{2:.2f}\t\t{3:.2f}".format(
+            Params[i], ErrorsAll[i], ErrorsTrainAll[i], ErrorsBaselineAll[i]),))
         if i == bestInd:
-            print("\t\t best",)
+            print(("\t\t best",))
         print()
     return Params[bestInd], ErrorsAll[bestInd], ErrorsBaselineAll[bestInd]
 
@@ -943,15 +943,15 @@ def printConfusionMatrix(CM, ClassNames):
     for c in ClassNames:
         if len(c) > 4:
             c = c[0:3]
-        print("\t{0:s}".format(c),)
+        print(("\t{0:s}".format(c),))
     print()
 
     for i, c in enumerate(ClassNames):
         if len(c) > 4:
             c = c[0:3]
-        print("{0:s}".format(c),)
+        print(("{0:s}".format(c),))
         for j in range(len(ClassNames)):
-            print("\t{0:.2f}".format(100.0 * CM[i][j] / numpy.sum(CM)),)
+            print(("\t{0:.2f}".format(100.0 * CM[i][j] / numpy.sum(CM)),))
         print()
 
 
@@ -1064,9 +1064,11 @@ def fileClassification(inputFile, modelName, modelType):
     x = audioBasicIO.stereo2mono(x)
 
     if isinstance(x, int):                                 # audio file IO problem
+        print("fileClassification: audio file IO problem")
         return (-1, -1, -1)
-    if x.shape[0] / float(Fs) <= mtWin:
-        return (-1, -1, -1)
+    # FIXME: mid-term window check fails with short files.
+    #if x.shape[0] / float(Fs) <= mtWin:
+        #return (-1, -1, -1)
 
     # feature extraction:
     [MidTermFeatures, s] = aF.mtFeatureExtraction(
@@ -1146,7 +1148,7 @@ def lda(data, labels, redDim):
     data -= data.mean(axis=0)
     nData = numpy.shape(data)[0]
     nDim = numpy.shape(data)[1]
-    print(nData, nDim)
+    print((nData, nDim))
     Sw = numpy.zeros((nDim, nDim))
     Sb = numpy.zeros((nDim, nDim))
 

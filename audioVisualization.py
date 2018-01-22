@@ -12,8 +12,8 @@ import sys
 from pylab import *
 from scipy.spatial import distance
 
-import audioFeatureExtraction as aF
-import audioTrainTest as aT
+from . import audioFeatureExtraction as aF
+from . import audioTrainTest as aT
 
 
 def generateColorMap():
@@ -36,9 +36,9 @@ def levenshtein(str1, s2):
     N1 = len(str1)
     N2 = len(s2)
 
-    stringRange = [range(N1 + 1)] * (N2 + 1)
+    stringRange = [list(range(N1 + 1))] * (N2 + 1)
     for i in range(N2 + 1):
-        stringRange[i] = range(i, i + N1 + 1)
+        stringRange[i] = list(range(i, i + N1 + 1))
     for i in range(0, N2):
         for j in range(0, N1):
             if str1[j] == s2[i]:

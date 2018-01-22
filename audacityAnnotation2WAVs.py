@@ -1,11 +1,11 @@
-import audioBasicIO
+from . import audioBasicIO
 import csv
 import glob
 import os
 import scipy.io.wavfile as wavfile
 import sys
 
-import audioBasicIO
+from . import audioBasicIO
 
 
 def annotation2files(wavFile, csvFile):
@@ -28,7 +28,7 @@ def annotation2files(wavFile, csvFile):
             label = "%s_%s_%.2f_%.2f.wav" % (wavFile, row[2], T1, T2)
             label = label.replace(" ", "_")
             xtemp = x[int(round(T1 * Fs)):int(round(T2 * Fs))]
-            print(T1, T2, label, xtemp.shape)
+            print((T1, T2, label, xtemp.shape))
             wavfile.write(label, Fs, xtemp)
 
 

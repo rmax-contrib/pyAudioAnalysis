@@ -15,9 +15,9 @@ import sklearn.discriminant_analysis
 from six.moves import cPickle
 from scipy.spatial import distance
 
-import audioBasicIO
-import audioFeatureExtraction as aF
-import audioTrainTest as aT
+from . import audioBasicIO
+from . import audioFeatureExtraction as aF
+from . import audioTrainTest as aT
 
 """ General utility functions """
 
@@ -200,20 +200,20 @@ def plotSegmentationResults(flagsInd, flagsIndGT, classNames, mtStep, ONLY_EVALU
                 AvDurations[i] = 0.0
 
         for i in range(Percentages.shape[0]):
-            print(classNames[i], Percentages[i], AvDurations[i])
+            print((classNames[i], Percentages[i], AvDurations[i]))
 
         font = {'size': 10}
         plt.rc('font', **font)
 
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
-        ax1.set_yticks(numpy.array(range(len(classNames))))
+        ax1.set_yticks(numpy.array(list(range(len(classNames)))))
         ax1.axis((0, Duration, -1, len(classNames)))
         ax1.set_yticklabels(classNames)
-        ax1.plot(numpy.array(range(len(flagsInd)))
+        ax1.plot(numpy.array(list(range(len(flagsInd))))
                  * mtStep + mtStep / 2.0, flagsInd)
         if flagsIndGT.shape[0] > 0:
-            ax1.plot(numpy.array(range(len(flagsIndGT))) *
+            ax1.plot(numpy.array(list(range(len(flagsIndGT)))) *
                      mtStep + mtStep / 2.0, flagsIndGT + 0.05, '--r')
         plt.xlabel("time (seconds)")
         if accuracy >= 0:
@@ -222,16 +222,16 @@ def plotSegmentationResults(flagsInd, flagsIndGT, classNames, mtStep, ONLY_EVALU
         ax2 = fig.add_subplot(223)
         plt.title("Classes percentage durations")
         ax2.axis((0, len(classNames) + 1, 0, 100))
-        ax2.set_xticks(numpy.array(range(len(classNames) + 1)))
+        ax2.set_xticks(numpy.array(list(range(len(classNames) + 1))))
         ax2.set_xticklabels([" "] + classNames)
-        ax2.bar(numpy.array(range(len(classNames))) + 0.5, Percentages)
+        ax2.bar(numpy.array(list(range(len(classNames)))) + 0.5, Percentages)
 
         ax3 = fig.add_subplot(224)
         plt.title("Segment average duration per class")
         ax3.axis((0, len(classNames) + 1, 0, AvDurations.max()))
-        ax3.set_xticks(numpy.array(range(len(classNames) + 1)))
+        ax3.set_xticks(numpy.array(list(range(len(classNames) + 1))))
         ax3.set_xticklabels([" "] + classNames)
-        ax3.bar(numpy.array(range(len(classNames))) + 0.5, AvDurations)
+        ax3.bar(numpy.array(list(range(len(classNames)))) + 0.5, AvDurations)
         fig.tight_layout()
         plt.show()
     return accuracy
@@ -497,7 +497,7 @@ def hmmSegmentation(wavFileName, hmmModelName, PLOT=False, gtFileName=""):
     acc = plotSegmentationResults(
         flagsInd, flagsIndGT, classesAll, mtStep, not PLOT)
     if acc >= 0:
-        print("Overall Accuracy: {0:.2f}".format(acc))
+        print(("Overall Accuracy: {0:.2f}".format(acc)))
         return (flagsInd, classNamesGT, acc, CM)
     else:
         return (flagsInd, classesAll, -1, -1)
@@ -539,8 +539,8 @@ def mtFileClassification(inputFile, modelName, modelType, plotResults=False, gtF
             stStep, computeBEAT] = aT.loadExtraTreesModel(modelName)
 
     if computeBEAT:
-        print("Model " + modelName +
-              " contains long-term music features (beat etc) and cannot be used in segmentation")
+        print(("Model " + modelName +
+              " contains long-term music features (beat etc) and cannot be used in segmentation"))
         return (-1, -1, -1, -1)
     [Fs, x] = audioBasicIO.readAudioFile(inputFile)        # load input file
     if Fs == -1:                                           # could not read file
@@ -596,7 +596,7 @@ def mtFileClassification(inputFile, modelName, modelType, plotResults=False, gtF
     acc = plotSegmentationResults(
         flagsInd, flagsIndGT, classNames, mtStep, not plotResults)
     if acc >= 0:
-        print("Overall Accuracy: {0:.3f}".format(acc))
+        print(("Overall Accuracy: {0:.3f}".format(acc)))
         return (flagsInd, classNamesGT, acc, CM)
     else:
         return (flagsInd, classNames, acc, CM)
@@ -626,7 +626,7 @@ def evaluateSegmentationClassificationDir(dirName, modelName, methodName):
             else:
                 CM = CM + CMt
             accuracys.append(acc)
-            print(CMt, classNames)
+            print((CMt, classNames))
             print(CM)
             [Rec, Pre, F1] = computePreRec(CMt, classNames)
 
@@ -634,15 +634,15 @@ def evaluateSegmentationClassificationDir(dirName, modelName, methodName):
     [Rec, Pre, F1] = computePreRec(CM, classNames)
 
     print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
-    print("Average Accuracy: {0:.1f}".format(
-        100.0 * numpy.array(accuracys).mean()))
-    print("Average Recall: {0:.1f}".format(100.0 * numpy.array(Rec).mean()))
-    print("Average Precision: {0:.1f}".format(100.0 * numpy.array(Pre).mean()))
-    print("Average F1: {0:.1f}".format(100.0 * numpy.array(F1).mean()))
-    print("Median Accuracy: {0:.1f}".format(
-        100.0 * numpy.median(numpy.array(accuracys))))
-    print("Min Accuracy: {0:.1f}".format(100.0 * numpy.array(accuracys).min()))
-    print("Max Accuracy: {0:.1f}".format(100.0 * numpy.array(accuracys).max()))
+    print(("Average Accuracy: {0:.1f}".format(
+        100.0 * numpy.array(accuracys).mean())))
+    print(("Average Recall: {0:.1f}".format(100.0 * numpy.array(Rec).mean())))
+    print(("Average Precision: {0:.1f}".format(100.0 * numpy.array(Pre).mean())))
+    print(("Average F1: {0:.1f}".format(100.0 * numpy.array(F1).mean())))
+    print(("Median Accuracy: {0:.1f}".format(
+        100.0 * numpy.median(numpy.array(accuracys)))))
+    print(("Min Accuracy: {0:.1f}".format(100.0 * numpy.array(accuracys).min())))
+    print(("Max Accuracy: {0:.1f}".format(100.0 * numpy.array(accuracys).max())))
 
 
 def silenceRemoval(x, Fs, stWin, stStep, smoothWindow=0.5, Weight=0.5, plot=False):
@@ -913,7 +913,7 @@ def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.
         MidTermFeaturesNorm = (clf.transform(MidTermFeaturesNorm.T)).T
 
     if numOfSpeakers <= 0:
-        sRange = range(2, 10)
+        sRange = list(range(2, 10))
     else:
         sRange = [numOfSpeakers]
     clsAll = []
@@ -1021,19 +1021,19 @@ def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.
             ax1 = fig.add_subplot(111)
         else:
             ax1 = fig.add_subplot(211)
-        ax1.set_yticks(numpy.array(range(len(classNames))))
+        ax1.set_yticks(numpy.array(list(range(len(classNames)))))
         ax1.axis((0, Duration, -1, len(classNames)))
         ax1.set_yticklabels(classNames)
-        ax1.plot(numpy.array(range(len(cls))) * mtStep + mtStep / 2.0, cls)
+        ax1.plot(numpy.array(list(range(len(cls)))) * mtStep + mtStep / 2.0, cls)
 
     if os.path.isfile(gtFile):
         if PLOT:
-            ax1.plot(numpy.array(range(len(flagsGT))) *
+            ax1.plot(numpy.array(list(range(len(flagsGT)))) *
                      mtStep + mtStep / 2.0, flagsGT, 'r')
         purityClusterMean, puritySpeakerMean = evaluateSpeakerDiarization(
             cls, flagsGT)
-        print("{0:.1f}\t{1:.1f}".format(
-            100 * purityClusterMean, 100 * puritySpeakerMean))
+        print(("{0:.1f}\t{1:.1f}".format(
+            100 * purityClusterMean, 100 * puritySpeakerMean)))
         if PLOT:
             plt.title("Cluster purity: {0:.1f}% - Speaker purity: {1:.1f}%".format(
                 100 * purityClusterMean, 100 * puritySpeakerMean))
@@ -1075,10 +1075,10 @@ def speakerDiarizationEvaluateScript(folderName, LDAs):
             N.append(-1)
 
     for l in LDAs:
-        print("LDA = {0:d}".format(l))
+        print(("LDA = {0:d}".format(l)))
         for i, wavFile in enumerate(wavFilesList):
             speakerDiarization(wavFile, N[i], 2.0, 0.2, 0.05, l, PLOT=False)
-        print
+        print()
 
 
 def musicThumbnailing(x, Fs, shortTermSize=1.0, shortTermStep=0.5, thumbnailSize=10.0, Limit1=0, Limit2=1):
