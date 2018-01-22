@@ -1,7 +1,7 @@
 import audioop
 import csv
 import glob
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import ntpath
 import numpy
 import os
@@ -15,7 +15,7 @@ import sys
 import time
 
 from six.moves import cPickle
-from matplotlib.mlab import find
+#from matplotlib.mlab import find
 from scipy import linalg as la
 from scipy.spatial import distance
 
